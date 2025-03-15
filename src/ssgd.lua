@@ -14,7 +14,6 @@ os.sleep(1)
 print(#addressBook .. " addresses found")
 
 print("Searching for connected stargate")
-local selectedAddress = 1
 local stargate = peripheral.find("stargate")
 if not stargate then
   print("ERROR: Stargate not found. Is it connected?")
@@ -25,18 +24,21 @@ end
 local pointsOfOrigin = {
   MilkyWay = "Point of Origin", -- TODO: support Nether PoO
   Pegasus = "Subido",
-  Universe = "G17"
+  Universe = 17
 }
 
-local type = stargate.getGateType()
-local pointOfOrigin = pointsOfOrigin[type]
-print(type .. " stargate connected")
+local localType = stargate.getGateType()
+print(localType .. " stargate connected")
 os.sleep(1)
 
 function main()
-  term.clear()
-  selectedAddress = 1
+  resetTerm()
   mainMenu()
+end
+
+function resetTerm()
+  term.clear()
+  term.setCursorPos(1, 1)
 end
 
 function listenForExit()
@@ -46,8 +48,7 @@ function listenForExit()
 
     if key == "q" then
       stargate.abortDialing()
-      term.clear()
-      term.setCursorPos(1, 1)
+      resetTerm()
       print("Exiting SSGD")
       return
     end
@@ -60,14 +61,17 @@ function listenEvents()
     local event = eventData[1]
 
     if event == "terminate" then
+      print()
       print("Exiting SSGD, aborting dialing")
       stargate.abortDialing()
       return
     elseif event == "stargate_failed" then
       local reason = eventData[3]
-      print("ERROR: " .. reason)
+      print()
+      print("Stargate Error: " .. reason)
       return
     elseif event == "stargate_incoming_wormhole" then
+      print()
       print("ERROR: Unscheduled off world activation!")
       return
     end
@@ -75,10 +79,12 @@ function listenEvents()
 end
 
 function mainMenu()
-  while true do
-    displayMenu()
+  local selectedAddress = 1
 
-    local event, keycode, is_held = os.pullEvent("key")
+  while true do
+    renderMenu(selectedAddress)
+
+    local _, keycode = os.pullEvent("key")
     local key = keys.getName(keycode)
 
     if key == "down" then
@@ -86,28 +92,21 @@ function mainMenu()
       if selectedAddress > #addressBook then
         selectedAddress = 1
       end
+      goto continue
     elseif key == "up" then
       selectedAddress = selectedAddress - 1
       if selectedAddress <= 0 then
         selectedAddress = #addressBook
       end
+      goto continue
     elseif key == "c" then
-      term.clear()
-      term.setCursorPos(1, 1)
       print("Closing gate")
       stargate.disengageGate()
-      os.sleep(5)
-      term.clear()
     elseif key == "a" then
-      term.clear()
-      term.setCursorPos(1, 1)
       print("Aborting dialing")
       stargate.abortDialing()
-      os.sleep(5)
-      term.clear()
     elseif key == "enter" then
-      term.clear()
-      term.setCursorPos(1, 1)
+      resetTerm()
       local addressEntry = addressBook[selectedAddress]
       local gateType = stargate.getGateType()
 
@@ -115,61 +114,99 @@ function mainMenu()
       local targetType = addressEntry.type
       local targetAddress = addressEntry.addresses[gateType]
 
-      print("Target: " .. targetName)
+      print("Target Name: " .. targetName)
       print("Target Type: " .. targetType)
+      print("Target # Glyphs: " .. #targetAddress)
+
+      print("")
       print("Source Type: " .. gateType)
 
-      if not targetAddress then
-        print("No " .. gateType .. " address found")
-        os.sleep(5)
-        term.clear()
-        goto continue
-      end
-
-      if targetType ~= gateType and #targetAddress < 7 then
+      local isValid, errorMsg = isValidAddress(targetAddress, targetType)
+      if isValid then
+        print("Dialing...")
+        dialAddress(targetAddress)
+      else
         print()
         print("ERROR:")
-        print("Address incomplete for dialing a " .. targetType .. " gate from a " .. gateType .. " gate.")
-        print("Please update the address book with a 7 or 8 glyph address")
-        os.sleep(5)
-        term.clear()
-        goto continue
-      end
 
-      print("Dialing...")
-      dialAddress(targetAddress)
-      os.sleep(5)
-      term.clear()
+        if errorMsg == "Address Missing" then
+          print("No " .. gateType .. " address found")
+        elseif errorMsg == "Too many glyphs" then
+          print("Address contains too many glyphs.")
+          print("Must be between 6 and 8 glyphs, excluding Point of Origin")
+        elseif errorMsg == "Incomplete Address" then
+          print("Address is incomplete for dialing")
+
+          if targetType == "Universe" then
+            print("Dialing a Universe gate from a " .. gateType .. " gate requires 8 glyphs")
+          else
+            print("Dialing a " .. targetType .. " gate from a " .. gateType .. " gate requires 7 glyphs")
+          end
+        elseif errorMsg == "Out of Range" then
+          print("Gate is out of range for dialing")
+          print("Universe gates can only dial other Universe gates")
+        else
+          print(errorMsg)
+        end
+      end
+    else
+      goto continue
     end
+
+    os.sleep(5)
+    term.clear()
 
     :: continue ::
   end
 end
 
-function displayMenu()
+function renderMenu(selectedAddress)
   term.setCursorPos(1, 1)
-  local gateType = stargate.getGateType()
-  print("Local Gate: " .. stargate.getGateType())
+  print("Local Gate: " .. localType)
   print("Please select an address")
 
   for index, entry in ipairs(addressBook) do
-    local remoteType = entry.type
-    local remoteAddress = entry.addresses[gateType]
+    local targetType = entry.type
+    local targetAddress = entry.addresses[localType]
+    local isValid, errorMsg = isValidAddress(targetAddress, targetType)
 
-    if not remoteAddress then
-      local caret = selectedAddress == index and "X" or " "
-      print(caret .. " " .. entry.name .. " [Address Missing]")
-    elseif gateType ~= remoteType and #remoteAddress < 7 then
-      local caret = selectedAddress == index and "X" or " "
-      print(caret .. " " .. entry.name .. " [Incomplete Address]")
-    else
-      local caret = selectedAddress == index and ">" or " "
-      print(caret .. " " .. entry.name)
+    local caret = " "
+    if selectedAddress == index then
+      caret = isValid and ">" or "X"
     end
+    write(caret .. " " .. entry.name)
+
+    if errorMsg then
+      write(" [" .. errorMsg .. "]")
+    end
+
+    print("")
   end
 
   print("")
   print("q: exit SSGD | c: close gate | a: abort dialing")
+end
+
+function isValidAddress(targetAddress, targetType)
+  local isMultiGate = localType ~= targetType
+  local needsFullAddress = isMultiGate and targetType == "Universe"
+  local outOfRange = isMultiGate and localType == "Universe"
+
+  if not targetAddress then
+    return false, "Address Missing"
+  elseif outOfRange then
+    return false, "Out of range"
+  elseif #targetAddress <= 5 then
+    return false, "Incomplete Address"
+  elseif needsFullAddress and #targetAddress < 8 then
+    return false, "Incomplete Address"
+  elseif isMultiGate and #targetAddress < 7 then
+    return false, "Incomplete Address"
+  elseif #targetAddress >= 9 then
+    return false, "Too many glyphs"
+  else
+    return true
+  end
 end
 
 function waitForStatus(status)
@@ -198,6 +235,7 @@ function dialAddress(address)
     error("ArgError: Address must be 6-8 symbols, excluding Point of Origin")
   end
 
+  local pointOfOrigin = pointsOfOrigin[localType]
   local lastChevron = #address + 1
   for index, symbol in ipairs(address) do
     write("Chevron " .. index .. ": " .. symbol)
