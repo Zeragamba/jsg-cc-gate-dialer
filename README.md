@@ -6,4 +6,4 @@ the [Just Stargate Mod](https://modrinth.com/mod/jsg)
 
 # Install
 
-run `wget`
+run `wget run https://raw.githubusercontent.com/Zeragamba/jsg-cc-gate-dialer/refs/heads/main/src/ssgd-install.lua`

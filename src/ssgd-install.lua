@@ -13,7 +13,7 @@ local function download_file(src_path, dest)
 end
 
 if fs.exists(dialer_filename) then
-  fs.move(dialer_filename, "ssgd.bak.lua")
+  fs.delete(dialer_filename)
 end
 
 download_file(dialer_filename)
