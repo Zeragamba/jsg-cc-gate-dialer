@@ -1,7 +1,7 @@
 print("== SSGD-CC installer ==")
 
 local raw_files_url = "https://raw.githubusercontent.com/Zeragamba/jsg-cc-gate-dialer"
-local ref_name = 'main'
+local ref_name = "main"
 
 local function download_file(src_path, dest)
   local src_url = raw_files_url .. "/refs/heads/" .. ref_name .. "/src/" .. src_path
@@ -9,9 +9,10 @@ local function download_file(src_path, dest)
   shell.execute("wget", src_url, dest_file)
 end
 
-download_file('ssgd.lua')
+if fs.exists("ssgd.lua") then fs.move("ssgd.lua", "ssgd.bak.lua") end
+download_file("ssgd.lua")
 
-if not fs.exists('address-book.lua') then
+if not fs.exists("address-book.lua") then
   download_file("address-book.lua")
 end
 

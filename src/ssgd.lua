@@ -1,7 +1,7 @@
 term.clear()
 term.setCursorPos(1, 1)
 
-local addressBook = require('address-book')
+local addressBook = require("address-book")
 if not addressBook then
   print("ERROR: address-book.lua missing.")
   print("Please reinstall SSGD to generate a new one")
