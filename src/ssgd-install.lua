@@ -11,8 +11,7 @@ end
 
 download_file('ssgd.lua')
 
-if fs.exists('address-book.lua') then
-
+if not fs.exists('address-book.lua') then
     download_file("address-book.lua")
 end
 
