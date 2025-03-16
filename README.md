@@ -9,5 +9,5 @@ and [CC: Tweaked](https://modrinth.com/mod/cc-tweaked) computers
 On your ComputerCraft Computer run the following command:
 
 ```sh
-wget run https://raw.githubusercontent.com/Zeragamba/jsg-cc-gate-dialer/refs/heads/main/src/ssgd-install.lua
+wget run https://raw.githubusercontent.com/Zeragamba/jsg-cc-gate-dialer/refs/heads/main/install.lua
 ```
