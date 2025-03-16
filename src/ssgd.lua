@@ -121,29 +121,27 @@ function mainMenu()
   local function onDialAddress()
     term.reset()
     local entry, errorType = getAddressToDial(selectedAddress)
-    if not entry then
-      print()
+    if errorType then
+      local localType = stargate.getGateType()
       print("ERROR:")
 
       if errorType == ErrorType.ADDRESS_MISSING then
-        print("No " .. gateType .. " address found")
+        print("No " .. localType .. " address found")
       elseif errorType == ErrorType.ADDRESS_TOO_LONG then
         print("Address contains too many glyphs.")
         print("Must be between 6 and 8 glyphs, excluding Point of Origin")
       elseif errorType == ErrorType.ADDRESS_INCOMPLETE then
+        local symbolsNeeded = entry.type == "Universe" and 8 or 7
         print("Address is incomplete for dialing")
-
-        if remoteType == "Universe" then
-          print("Dialing a Universe gate from a " .. gateType .. " gate requires 8 glyphs")
-        else
-          print("Dialing a " .. remoteType .. " gate from a " .. gateType .. " gate requires 7 glyphs")
-        end
+        print("Dialing a " .. entry.type .. " gate from a " .. localType .. " gate requires " .. symbolsNeeded .. " glyphs")
       elseif errorType == ErrorType.OUT_OF_RANGE then
         print("Gate is out of range for dialing")
         print("Universe gates can only dial other Universe gates")
       else
         print(errorType)
       end
+
+      return
     end
 
     print("Dialing " .. entry.name)
@@ -180,27 +178,29 @@ function getAddressToDial(addressIndex)
   local remoteType = addressEntry.type
   local remoteAddress = addressEntry.addresses[localType]
 
+  local result = {
+    name = addressEntry.name,
+    type = addressEntry.type,
+    address = nil
+  }
+
   local isValid, errorType = isValidAddress(remoteAddress, remoteType)
-  if not isValid then return nil, errorType end
+  if not isValid then return result, errorType end
 
   if localType == remoteType then
     -- same gate addresses can use 6 glyphs
-    remoteAddress = { table.unpack(remoteAddress, 1, 6) }
+    result.address = { table.unpack(remoteAddress, 1, 6) }
   elseif remoteType == "Universe" then
     -- dialing a universe gate from non-uni gate requires a complete address
-    remoteAddress = { table.unpack(remoteAddress, 1, 8) }
+    result.address = { table.unpack(remoteAddress, 1, 8) }
   else
     -- cross gate dialing requires 7 glyphs
-    remoteAddress = { table.unpack(remoteAddress, 1, 7) }
+    result.address = { table.unpack(remoteAddress, 1, 7) }
   end
 
-  table.insert(remoteAddress, pointsOfOrigin[localType])
+  table.insert(result.address, pointsOfOrigin[localType])
 
-  return {
-    name = addressEntry.name,
-    type = addressEntry.type,
-    address = remoteAddress,
-  }
+  return result
 end
 
 function renderMenu(selectedAddress)
