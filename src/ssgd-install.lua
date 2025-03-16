@@ -6,10 +6,9 @@ local ref_name = "main"
 local dialer_filename = "ssgd.lua"
 local address_book_filename = "address-book.lua"
 
-local function download_file(src_path, dest)
+local function download_file(src_path)
   local src_url = raw_files_url .. "/refs/heads/" .. ref_name .. "/src/" .. src_path
-  local dest_file = shell.resolve(dest or src_path)
-  shell.execute("wget", src_url, dest_file)
+  shell.execute("wget", src_url, src_path)
 end
 
 if fs.exists(dialer_filename) then
@@ -18,7 +17,8 @@ end
 
 download_file(dialer_filename)
 
-if not fs.exists(address_book_filename) then
+local address_book_file = fs.resolve(address_book_filename)
+if not fs.exists(address_book_file) then
   download_file(address_book_filename)
 end
 
