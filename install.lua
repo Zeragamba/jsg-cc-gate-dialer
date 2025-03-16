@@ -17,7 +17,7 @@ end
 
 download_file(dialer_filename)
 
-local address_book_file = fs.resolve(address_book_filename)
+local address_book_file = shell.resolve(address_book_filename)
 if not fs.exists(address_book_file) then
   download_file(address_book_filename)
 end
