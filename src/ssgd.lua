@@ -1,5 +1,6 @@
 local addressBook
 local stargate
+local version = "0.1.0"
 
 local pointsOfOrigin = {
   MilkyWay = "Point of Origin", -- TODO: support Nether PoO
@@ -35,7 +36,7 @@ function initialize()
     return false
   end
 
-  print("Booting SSGD")
+  print("Booting SSGD " .. version)
   os.sleep(1)
   print(#addressBook .. " addresses found")
 
@@ -120,8 +121,10 @@ function mainMenu()
 
   local function onDialAddress()
     term.reset()
-    local entry, errorType = getAddressToDial(selectedAddress)
-    if errorType then
+    local success, data = getAddressToDial(selectedAddress)
+
+    if not success then
+      local errorType = data.error
       local localType = stargate.getGateType()
       print("ERROR:")
 
@@ -144,9 +147,9 @@ function mainMenu()
       return
     end
 
-    print("Dialing " .. entry.name)
+    print("Dialing " .. data.name)
     print()
-    dialAddress(entry.address)
+    dialAddress(data.address)
   end
 
   while true do
@@ -178,29 +181,24 @@ function getAddressToDial(addressIndex)
   local remoteType = addressEntry.type
   local remoteAddress = addressEntry.addresses[localType]
 
-  local result = {
-    name = addressEntry.name,
-    type = addressEntry.type,
-    address = nil
-  }
-
   local isValid, errorType = isValidAddress(remoteAddress, remoteType)
-  if not isValid then return result, errorType end
-
-  if localType == remoteType then
-    -- same gate addresses can use 6 glyphs
-    result.address = { table.unpack(remoteAddress, 1, 6) }
-  elseif remoteType == "Universe" then
-    -- dialing a universe gate from non-uni gate requires a complete address
-    result.address = { table.unpack(remoteAddress, 1, 8) }
-  else
-    -- cross gate dialing requires 7 glyphs
-    result.address = { table.unpack(remoteAddress, 1, 7) }
+  if not isValid then
+    return false, { error = errorType }
   end
 
-  table.insert(result.address, pointsOfOrigin[localType])
+  local success_or_error, numGlyphs = stargate.getSymbolsNeeded(remoteAddress)
+  if success_or_error == "address_malformed" then
+    return false, { error = "Address invalid." }
+  end
 
-  return result
+  local targetAddress = { table.unpack(remoteAddress, 1, numGlyphs) }
+  table.insert(targetAddress, pointsOfOrigin[localType])
+
+  return true, {
+    name = addressEntry.name,
+    type = addressEntry.type,
+    address = targetAddress
+  }
 end
 
 function renderMenu(selectedAddress)
