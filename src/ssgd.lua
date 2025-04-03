@@ -1,6 +1,6 @@
 local addressBook
 local stargate
-local version = "0.2.0"
+local version = "0.2.1"
 
 local pointsOfOrigin = {
   MilkyWay = "Point of Origin", -- TODO: support Nether PoO

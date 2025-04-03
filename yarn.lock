@@ -39,7 +39,7 @@ __metadata:
   version: 6.0.6
   resolution: "@changesets/assemble-release-plan@npm:6.0.6"
   dependencies:
-    "@changesets/errors": "npm:^0.2.0"
+    "@changesets/errors": "npm:^0.2.1"
     "@changesets/get-dependents-graph": "npm:^2.1.3"
     "@changesets/should-skip-package": "npm:^0.1.2"
     "@changesets/types": "npm:^6.1.0"
@@ -66,7 +66,7 @@ __metadata:
     "@changesets/assemble-release-plan": "npm:^6.0.6"
     "@changesets/changelog-git": "npm:^0.2.1"
     "@changesets/config": "npm:^3.1.1"
-    "@changesets/errors": "npm:^0.2.0"
+    "@changesets/errors": "npm:^0.2.1"
     "@changesets/get-dependents-graph": "npm:^2.1.3"
     "@changesets/get-release-plan": "npm:^4.0.8"
     "@changesets/git": "npm:^3.0.2"
@@ -84,7 +84,7 @@ __metadata:
     fs-extra: "npm:^7.0.1"
     mri: "npm:^1.2.0"
     p-limit: "npm:^2.2.0"
-    package-manager-detector: "npm:^0.2.0"
+    package-manager-detector: "npm:^0.2.1"
     picocolors: "npm:^1.1.0"
     resolve-from: "npm:^5.0.0"
     semver: "npm:^7.5.3"
@@ -100,7 +100,7 @@ __metadata:
   version: 3.1.1
   resolution: "@changesets/config@npm:3.1.1"
   dependencies:
-    "@changesets/errors": "npm:^0.2.0"
+    "@changesets/errors": "npm:^0.2.1"
     "@changesets/get-dependents-graph": "npm:^2.1.3"
     "@changesets/logger": "npm:^0.1.1"
     "@changesets/types": "npm:^6.1.0"
@@ -111,9 +111,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@changesets/errors@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "@changesets/errors@npm:0.2.0"
+"@changesets/errors@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "@changesets/errors@npm:0.2.1"
   dependencies:
     extendable-error: "npm:^0.1.5"
   checksum: 10c0/f2757c752ab04e9733b0dfd7903f1caf873f9e603794c4d9ea2294af4f937c73d07273c24be864ad0c30b6a98424360d5b96a6eab14f97f3cf2cbfd3763b95c1
@@ -157,7 +157,7 @@ __metadata:
   version: 3.0.2
   resolution: "@changesets/git@npm:3.0.2"
   dependencies:
-    "@changesets/errors": "npm:^0.2.0"
+    "@changesets/errors": "npm:^0.2.1"
     "@manypkg/get-packages": "npm:^1.1.3"
     is-subdir: "npm:^1.1.1"
     micromatch: "npm:^4.0.8"
@@ -189,7 +189,7 @@ __metadata:
   version: 2.0.2
   resolution: "@changesets/pre@npm:2.0.2"
   dependencies:
-    "@changesets/errors": "npm:^0.2.0"
+    "@changesets/errors": "npm:^0.2.1"
     "@changesets/types": "npm:^6.1.0"
     "@manypkg/get-packages": "npm:^1.1.3"
     fs-extra: "npm:^7.0.1"
@@ -879,9 +879,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eastasianwidth@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "eastasianwidth@npm:0.2.0"
+"eastasianwidth@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "eastasianwidth@npm:0.2.1"
   checksum: 10c0/26f364ebcdb6395f95124fda411f63137a4bfb5d3a06453f7f23dfe52502905bd84e0488172e0f9ec295fdc45f05c23d5d91baf16bd26f0fe9acd777a188dc39
   languageName: node
   linkType: hard
@@ -1411,7 +1411,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lru-cache@npm:^10.0.1, lru-cache@npm:^10.2.0":
+"lru-cache@npm:^10.0.1, lru-cache@npm:^10.2.1":
   version: 10.4.3
   resolution: "lru-cache@npm:10.4.3"
   checksum: 10c0/ebd04fbca961e6c1d6c0af3799adcc966a1babe798f685bb84e6599266599cd95d94630b10262f5424539bc4640107e8a33aa28585374abf561d30d16f4b39fb
@@ -1678,7 +1678,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"package-manager-detector@npm:^0.2.0":
+"package-manager-detector@npm:^0.2.1":
   version: 0.2.11
   resolution: "package-manager-detector@npm:0.2.11"
   dependencies:
@@ -1705,7 +1705,7 @@ __metadata:
   version: 1.11.1
   resolution: "path-scurry@npm:1.11.1"
   dependencies:
-    lru-cache: "npm:^10.2.0"
+    lru-cache: "npm:^10.2.1"
     minipass: "npm:^5.0.0 || ^6.0.2 || ^7.0.0"
   checksum: 10c0/32a13711a2a505616ae1cc1b5076801e453e7aae6ac40ab55b388bb91b9d0547a52f5aaceff710ea400205f18691120d4431e520afbe4266b836fadede15872d
   languageName: node
@@ -2059,7 +2059,7 @@ __metadata:
   version: 5.1.2
   resolution: "string-width@npm:5.1.2"
   dependencies:
-    eastasianwidth: "npm:^0.2.0"
+    eastasianwidth: "npm:^0.2.1"
     emoji-regex: "npm:^9.2.2"
     strip-ansi: "npm:^7.0.1"
   checksum: 10c0/ab9c4264443d35b8b923cbdd513a089a60de339216d3b0ed3be3ba57d6880e1a192b70ae17225f764d7adbf5994e9bb8df253a944736c15a0240eff553c678ca
