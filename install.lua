@@ -5,7 +5,7 @@ local ref_name = "0.2.1"
 
 local function download_file(src_path, dest_path)
     local src_url = raw_files_url .. "/refs/heads/" .. ref_name .. "/src/" .. src_path
-    shell.execute("wget", src_url, dest_path)
+    shell.execute("wget", src_url, dest_path or src_path)
 end
 
 local files = {
@@ -15,7 +15,7 @@ local files = {
     "lib/ui/main-menu.lua",
 }
 
-for i, file in ipairs(files) do
+for _, file in ipairs(files) do
     local dest_path = shell.resolve(file)
 
     if fs.exists(dest_path) then
@@ -23,8 +23,6 @@ for i, file in ipairs(files) do
     end
 
     download_file(file, dest_path)
-
-    print(line)
 end
 
 local address_book_file = shell.resolve("address-book.lua")
