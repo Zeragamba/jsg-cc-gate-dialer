@@ -1,6 +1,5 @@
 return { {
 	name = "Abydos",
-    type = "MilkyWay",
 	addresses = {
 		MilkyWay = {
 			"Taurus",
@@ -13,7 +12,6 @@ return { {
 	},
 }, {
 	name = "Example", -- Name of the stargate
-    type = "MilkyWay", -- The type of the gate, to determine if a 7 symbol address can be used
 	addresses = {
 		-- Addresses for the gate based on glyph type
 		MilkyWay = {
