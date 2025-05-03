@@ -1,5 +1,4 @@
-Simple Stargate Dialer for ComputerCraft (SSGD-CC)
-==================================================
+# Simple Stargate Dialer for ComputerCraft (SSGD-CC)
 
 This is a simple stargate dialing software for the [Just Stargate Mod](https://modrinth.com/mod/jsg)
 and [CC: Tweaked](https://modrinth.com/mod/cc-tweaked) computers
