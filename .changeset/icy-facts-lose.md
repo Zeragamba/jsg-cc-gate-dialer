@@ -1,5 +1,0 @@
----
-"ssgd": minor
----
-
-fix versioning

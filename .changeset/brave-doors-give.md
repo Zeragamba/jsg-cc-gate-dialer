@@ -1,5 +1,0 @@
----
-"ssgd": patch
----
-
-install prettier
