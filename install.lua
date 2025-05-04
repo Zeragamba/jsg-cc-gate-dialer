@@ -1,10 +1,10 @@
 print("== SSGD-CC installer ==")
 
 local raw_files_url = "https://raw.githubusercontent.com/Zeragamba/jsg-cc-gate-dialer"
-local ref_name = "v0.3.0"
+local ref_name = "v0.3.2"
 
 local function download_file(src_path, dest_path)
-    local src_url = raw_files_url .. "/refs/heads/" .. ref_name .. "/src/" .. src_path
+    local src_url = raw_files_url .. "/refs/tags/" .. ref_name .. "/src/" .. src_path
     shell.execute("wget", src_url, dest_path or src_path)
 end
 
