@@ -1,5 +1,11 @@
 # ssgd
 
+## 0.3.1
+
+### Patch Changes
+
+- fix install script
+
 ## 0.3.0
 
 ### Minor Changes
