@@ -1,3 +1,5 @@
+local Screen = require("lib/ui/screen")
+
 return function(stargate, addressBook)
     local _, statusBarY = term.getSize()
 
@@ -6,9 +8,10 @@ return function(stargate, addressBook)
     local menuY = 4
     local menuMaxItems = statusBarY - menuY - 1
 
-    local MainMenu = {}
+    local self = {}
+    local screen = Screen.new(term)
 
-    function MainMenu.getRemoteAddress(addressIndex)
+    function self.getRemoteAddress(addressIndex)
         local addressEntry = addressBook[addressIndex]
         local remoteAddress = addressEntry.addresses[localType]
         local success, data = stargate.resolveAddress(remoteAddress)
@@ -19,32 +22,51 @@ return function(stargate, addressBook)
 
         return true, {
             name = addressEntry.name,
-            address = data.address
+            address = data.address,
         }
     end
 
-    function MainMenu.renderMenu()
-        term.setCursorPos(1, 1)
-        print("Local Gate: " .. localType)
-        print("Please select an address")
-
-        term.setCursorPos(1, menuY)
-        for index, entry in ipairs(addressBook) do
-            write("  " .. entry.name)
-
-            local _, data = MainMenu.getRemoteAddress(index)
-            if data.error then
-                write(" [" .. data.error .. "]")
-            end
-
-            print("")
-        end
-
-        term.setCursorPos(1, statusBarY)
-        term.write("q: exit SSGD | c: close gate | a: abort dialing")
+    function self.onQuit()
+        error("Exiting SSGD", 0)
     end
 
-    function MainMenu.setSelectedIndex(value)
+    function self.renderMenu()
+        screen.reset()
+        screen.setCursorPos(1, 1)
+        screen.print("Local Gate: " .. localType)
+        screen.print("Please select an address")
+
+        screen.setCursorPos(1, menuY)
+        for index, entry in ipairs(addressBook) do
+            screen.write("  ")
+
+            local _, data = self.getRemoteAddress(index)
+            if data.error then
+                screen.write(entry.name .. " [" .. data.error .. "]")
+            else
+                screen.button(entry.name, function()
+                    self.onDialAddress(index)
+                end)
+            end
+
+            screen.print()
+        end
+
+        screen.setCursorPos(1, statusBarY)
+        screen.button("Q: Quit", function()
+            self.onQuit()
+        end)
+        screen.write(" ")
+        screen.button("C: Close Gate", function()
+            self.onCloseGate()
+        end)
+        screen.write(" ")
+        screen.button("A: Abort Dialing", function()
+            self.onAbortDialing()
+        end)
+    end
+
+    function self.setSelectedIndex(value)
         if value > #addressBook then
             value = 1
         end
@@ -56,13 +78,13 @@ return function(stargate, addressBook)
         selectedAddress = value
     end
 
-    function MainMenu.reset()
+    function self.reset()
         term.clear()
-        MainMenu.renderMenu()
-        MainMenu.drawCursor()
+        self.renderMenu()
+        self.drawCursor()
     end
 
-    function MainMenu.clearCursor()
+    function self.clearCursor()
         cursorY = menuY
         repeat
             term.setCursorPos(1, cursorY)
@@ -71,47 +93,51 @@ return function(stargate, addressBook)
         until cursorY == menuY + menuMaxItems
     end
 
-    function MainMenu.drawCursor()
-        MainMenu.clearCursor()
+    function self.drawCursor()
+        self.clearCursor()
         term.setCursorPos(1, menuY + selectedAddress - 1)
         term.write(">")
     end
 
-    function MainMenu.moveCursorUp()
-        MainMenu.clearCursor()
-        MainMenu.setSelectedIndex(selectedAddress - 1)
-        MainMenu.drawCursor()
+    function self.moveCursorUp()
+        self.clearCursor()
+        self.setSelectedIndex(selectedAddress - 1)
+        self.drawCursor()
     end
 
-    function MainMenu.moveCursorDown()
-        MainMenu.setSelectedIndex(selectedAddress + 1)
-        MainMenu.drawCursor()
+    function self.moveCursorDown()
+        self.setSelectedIndex(selectedAddress + 1)
+        self.drawCursor()
     end
 
-    function MainMenu.drawCursor()
-        MainMenu.clearCursor()
+    function self.drawCursor()
+        self.clearCursor()
         term.setCursorPos(1, menuY + selectedAddress - 1)
         term.write(">")
     end
 
-    function MainMenu.onCloseGate()
+    function self.onCloseGate()
         term.clear()
         term.setCursorPos(1, 1)
         term.write("Closing gate")
         stargate.closeGate()
+        os.sleep(5)
+        self.reset()
     end
 
-    function MainMenu.onAbortDialing()
+    function self.onAbortDialing()
         term.clear()
         term.setCursorPos(1, 1)
         term.write("Aborting dialing")
         stargate.abort()
+        os.sleep(5)
+        self.reset()
     end
 
-    function MainMenu.onDialAddress()
+    function self.onDialAddress(index)
         term.reset()
 
-        local success, data = MainMenu.getRemoteAddress(selectedAddress)
+        local success, data = self.getRemoteAddress(index)
 
         if not success then
             local errorType = data.error
@@ -143,31 +169,31 @@ return function(stargate, addressBook)
         print("Dialing " .. data.name)
         print()
         stargate.dialAddress(data.address)
+        os.sleep(5)
+        self.reset()
     end
 
-    MainMenu.renderMenu()
-    MainMenu.drawCursor()
+    function listenKeyDown()
+        while true do
+            local _, keycode = os.pullEvent("key")
+            local key = keys.getName(keycode)
 
-    while true do
-        local _, keycode = os.pullEvent("key")
-        local key = keys.getName(keycode)
-
-        if key == "down" then
-            MainMenu.moveCursorDown()
-        elseif key == "up" then
-            MainMenu.moveCursorUp()
-        elseif key == "c" then
-            MainMenu.onCloseGate()
-            os.sleep(5)
-            MainMenu.reset()
-        elseif key == "a" then
-            MainMenu.onAbortDialing()
-            MainMenu.reset()
-            os.sleep(5)
-        elseif key == "enter" then
-            MainMenu.onDialAddress()
-            os.sleep(5)
-            MainMenu.reset()
+            if key == "down" then
+                self.moveCursorDown()
+            elseif key == "up" then
+                self.moveCursorUp()
+            elseif key == "c" then
+                self.onCloseGate()
+            elseif key == "a" then
+                self.onAbortDialing()
+            elseif key == "enter" then
+                self.onDialAddress(selectedAddress)
+            end
         end
     end
+
+    self.renderMenu()
+    self.drawCursor()
+
+    parallel.waitForAny(listenKeyDown, screen.listen)
 end

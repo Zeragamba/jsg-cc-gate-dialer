@@ -13,6 +13,8 @@ local files = {
     "lib/errors.lua",
     "lib/stargate.lua",
     "lib/ui/main-menu.lua",
+    "lib/ui/mouse-handler.lua",
+    "lib/ui/screen.lua",
 }
 
 for _, file in ipairs(files) do
@@ -30,8 +32,8 @@ if not fs.exists(address_book_file) then
     download_file("address-book.lua")
 end
 
-local versionFile = fs.open(shell.resolve('lib/version.lua'), "w")
-versionFile.write("return \"" .. ref_name .. "\"")
+local versionFile = fs.open(shell.resolve("lib/version.lua"), "w")
+versionFile.write('return "' .. ref_name .. '"')
 versionFile.close()
 
 print("== SSGD-CC installed! ==")

@@ -14,7 +14,12 @@ function main()
         return
     end
     term.reset()
-    MainMenu(stargate, addressBook)
+
+    if not pcall(function()
+        MainMenu(stargate, addressBook)
+    end) then
+        onExit()
+    end
 end
 
 function initialize()
@@ -37,18 +42,11 @@ function initialize()
     return true
 end
 
-function listenForExit()
-    while true do
-        local _, keycode = os.pullEvent("key_up")
-        local key = keys.getName(keycode)
-
-        if key == "q" then
-            stargate.abort()
-            term.reset()
-            print("Exiting SSGD")
-            return
-        end
-    end
+function onExit()
+    stargate.abort()
+    term.reset()
+    term.write("Exiting SSGD")
+    term.setCursorPos(1, 2)
 end
 
 function listenEvents()
@@ -57,10 +55,15 @@ function listenEvents()
         local event = eventData[1]
 
         if event == "terminate" then
-            term.reset()
-            print("Exiting SSGD, aborting dialing")
-            stargate.abort()
+            onExit()
             return
+        elseif event == "key_up" then
+            local key = keys.getName(eventData[2])
+
+            if key == "q" then
+                onExit()
+                return
+            end
         elseif event == "stargate_failed" then
             local reason = eventData[3]
             term.reset()
@@ -74,4 +77,4 @@ function listenEvents()
     end
 end
 
-parallel.waitForAny(listenForExit, listenEvents, main)
+parallel.waitForAny(listenEvents, main)
